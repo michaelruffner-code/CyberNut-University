@@ -644,5 +644,28 @@ document.addEventListener("keydown",function(e){if(e.key==="/"&&document.activeE
 setPlatUI(); route();
 </script>
 
+<script>
+/* Auto height when embedded in an iframe: tells the parent page how tall the help center is */
+(function(){
+  if(window.parent===window)return;
+  var last=0;
+  function send(nav){
+    var h=Math.ceil(document.body.getBoundingClientRect().height);
+    if(h!==last||nav){last=h;try{parent.postMessage({type:"cybernut-help-height",height:h,nav:!!nav},"*")}catch(e){}}
+  }
+  document.documentElement.classList.add("embedded");
+  window.addEventListener("load",function(){send()});
+  window.addEventListener("resize",function(){send()});
+  window.addEventListener("hashchange",function(){setTimeout(function(){send(true)},30)});
+  if("ResizeObserver" in window)new ResizeObserver(function(){send()}).observe(document.body);
+  setInterval(send,1000);
+  send();
+})();
+</script>
+<style>
+html.embedded .top{position:static}
+html.embedded nav.side,html.embedded aside.rail{position:static}
+html.embedded body{overflow:hidden}
+</style>
 </body>
 </html>
